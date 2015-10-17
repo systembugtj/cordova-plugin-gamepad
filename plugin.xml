@@ -33,7 +33,7 @@
     <issue></issue>
 
     <engines>
-  		<engine name="cordova" version=">=5.0.0" />
+  		<engine name="cordova" version=">=3.0.0" />
   	</engines>
 
     <!-- No longer needed as modules are being used -->
