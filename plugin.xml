@@ -32,6 +32,10 @@
     <repo>https://github.com/judax/cordova-plugin-gamepad.git</repo>
     <issue></issue>
 
+    <engines>
+  		<engine name="cordova" version=">=5.0.0" />
+  	</engines>
+
     <!-- No longer needed as modules are being used -->
     <!-- <asset src="www/Gamepad.js" target="Gamepad.js" /> -->
 
@@ -63,7 +67,7 @@
 
         <framework src="GameController.framework" weak="true" />
         <framework src="QuartzCore.framework" weak="true" />
-        
+
     </platform>
 
 </plugin>
