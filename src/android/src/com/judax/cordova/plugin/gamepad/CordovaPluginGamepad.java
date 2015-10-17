@@ -22,11 +22,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnGenericMotionListener;
 import android.view.View.OnKeyListener;
+import android.util.Log;
+import android.webkit.WebView;
 
 @SuppressLint("NewApi")
 public class CordovaPluginGamepad extends CordovaPlugin implements
 		OnGenericMotionListener, OnKeyListener, InputManager.InputDeviceListener
 {
+	private static final String TAG = "CordovaPluginGamepad";
 	private static final int NUMBER_OF_BUTTONS = 17;
 	private static final int NUMBER_OF_AXES = 4;
 	private static final String ID = "id";
@@ -234,12 +237,23 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 				// System.out.println(inputDevice.getName() + ": isJoystick = "
 				// + isJoystick + ", isGamepad = " + isGamepad + ", isVirtual = "
 				// + isVirtual + ", motionRangesCount = " + motionRangesCount);
-				gamepads.put(createGamepadForInputDevice(InputDevice
-						.getDevice(deviceId)));
+				gamepads.put(createGamepadForInputDevice(InputDevice.getDevice(deviceId)));
 			}
 		}
 	}
 
+	/*
+	 * Helper class to getView
+	 */
+	private WebView getView() {
+    try {
+			WebView web = (WebView)webView.getClass().getMethod("getView").invoke(webView);
+			Log.d(TAG, web.getClass().getName());
+			return web;
+    } catch (Exception e) {
+      return (WebView)webView;
+		}
+	}
 	@Override
 	public void initialize(final CordovaInterface cordova, CordovaWebView webView)
 	{
@@ -255,8 +269,9 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			refreshGamepads();
 			initialTimeMillis = System.currentTimeMillis();
 
-			webView.getView().setOnGenericMotionListener(this);
-			webView.getView().setOnKeyListener(this);
+			Log.d(TAG, "set event handler on view.");
+			getView().setOnGenericMotionListener(this);
+			getView().setOnKeyListener(this);
 
 			cordova.getActivity().runOnUiThread(new Runnable()
 			{
@@ -280,8 +295,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@Override
 	public void onDestroy()
 	{
-		this.webView.getView().setOnGenericMotionListener(null);
-		this.webView.getView().setOnKeyListener(null);
+		getView().setOnGenericMotionListener(null);
+		getView().setOnKeyListener(null);
 
 		usedIndices = null;
 		buttonsToJustProcessActionDown = null;
@@ -304,6 +319,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	public boolean execute(String action, String rawArgs,
 			CallbackContext callbackContext) throws JSONException
 	{
+			Log.v(TAG, "execute action is" + action);
 		boolean valid = true;
 		if (action.equals("getGamepads"))
 		{
@@ -534,6 +550,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@TargetApi(12)
 	public boolean onGenericMotion(View v, MotionEvent event)
 	{
+		Log.d(TAG, "onGenericMotion is called");
 		boolean processed = false;
 		try
 		{
@@ -611,6 +628,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@TargetApi(9)
 	public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
+		Log.d(TAG, "onKey is called");
+		Log.d(TAG, "keyCode is " + Integer.toString(keyCode));
 		boolean processed = false;
 		try
 		{
