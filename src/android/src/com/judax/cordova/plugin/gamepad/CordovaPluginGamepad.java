@@ -255,8 +255,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			refreshGamepads();
 			initialTimeMillis = System.currentTimeMillis();
 
-			webView.setOnGenericMotionListener(this);
-			webView.setOnKeyListener(this);
+			webView.getView().setOnGenericMotionListener(this);
+			webView.getView().setOnKeyListener(this);
 
 			cordova.getActivity().runOnUiThread(new Runnable()
 			{
@@ -280,8 +280,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@Override
 	public void onDestroy()
 	{
-		this.webView.setOnGenericMotionListener(null);
-		this.webView.setOnKeyListener(null);
+		this.webView.getView().setOnGenericMotionListener(null);
+		this.webView.getView().setOnKeyListener(null);
 
 		usedIndices = null;
 		buttonsToJustProcessActionDown = null;
@@ -418,15 +418,15 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 //			showDeviceIdsToIndices();
 //			showGamepads();
 
-			// It seems that the JSONArray class does not implement the remove method. This is why we need to 
+			// It seems that the JSONArray class does not implement the remove method. This is why we need to
 			// create a newGamepads array and copy the gamepads to it.
 			// TODO: Research on obfuscation possible solution as stated in: http://stackoverflow.com/questions/20389105/changing-or-upgrading-built-in-org-json-libraries-is-possible-and-a-good-idea
-			
+
 			// System.out.println("onInputDeviceRemoved: " + deviceId);
 			if (deviceIdToIndex.containsKey(deviceId))
 			{
 				JSONObject gamepad = null;
-				long index = deviceIdToIndex.get(deviceId); 
+				long index = deviceIdToIndex.get(deviceId);
 				JSONArray newGamepads = new JSONArray();
 				for (int i = 0; i < gamepads.length(); i++)
 				{
@@ -434,7 +434,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 					if (gamepads.getJSONObject(i).getLong(INDEX) == index)
 					{
 						// Remove any reference to the buttonsToJustProcessActionDown for the removed gamepad
-						for (int k = 0; k < buttonsToJustProcessActionDown.size(); k++) 
+						for (int k = 0; k < buttonsToJustProcessActionDown.size(); k++)
 						{
 							if (buttonsToJustProcessActionDown.get(k).getGamepadIndex() == i)
 							{
@@ -443,7 +443,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 							}
 						}
 					}
-					else 
+					else
 					{
 						newGamepads.put(gamepad);
 					}
@@ -451,17 +451,17 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 				gamepads = newGamepads;
 				usedIndices.set((int)index,  false);
 				deviceIdToIndex.remove(deviceId);
-				
+
 				eventArgument.put(GAMEPAD, gamepad);
 				gamepadDisconnectedCallbackContext.success(eventArgument);
 			}
-			else 
+			else
 			{
 				System.err
 						.println("ERROR: A device with id '" + deviceId + "' has been disconnected and it was not inside the gamepad array!");
 			}
 
-			// This is the version that uses JSONArray remove call. Much cleaner, simple and efficient. The problem is 
+			// This is the version that uses JSONArray remove call. Much cleaner, simple and efficient. The problem is
 			// that is seems that some Android versions do not implement this function (event there is no compilation error).
 //			if (deviceIdToIndex.containsKey(deviceId))
 //			{
